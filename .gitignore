@@ -1,0 +1,6 @@
+node_modules
+dist
+# Buku PDF sumber (±250 MB, berhak cipta) — tetap lokal, tidak di-push
+sumber/
+.impeccable/
+.claude/

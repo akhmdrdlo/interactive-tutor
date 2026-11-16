@@ -1,0 +1,70 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html, body { margin: 0; height: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.6;
+  color: var(--cocoa);
+  /* Dinding di atas, lantai di bawah — menyambung dengan SVG kamar di layar berapa pun rasionya */
+  background: linear-gradient(to bottom, var(--wall) 0 72%, var(--floor) 72% 100%);
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  overflow: hidden;
+}
+
+h1, h2, h3, p { margin: 0; }
+
+button, input, label { font: inherit; color: inherit; }
+button { cursor: pointer; }
+
+:focus-visible {
+  outline: 4px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+.icon { width: 28px; height: 28px; flex: none; display: block; }
+
+.app {
+  height: 100dvh;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+
+/*
+ * Gerak dikurangi: animasi berulang & lompatan dimatikan, tetapi perubahan
+ * keadaan tetap terlihat lewat fade singkat (umpan balik tidak hilang).
+ */
+@media (prefers-reduced-motion: reduce) {
+  .beam, .sway, .cursor-blink, .layer-eyes, .avatar-figure, .mochi-figure,
+  .soon__mochi, .tag > * { animation: none !important; }
+  .hotspot, .hotspot:hover, .hotspot:focus-visible,
+  .hotspot.is-hopping, .hotspot.is-squished,
+  .item-card:hover, .subject-card:hover, .tab:hover, .swatch:hover, .icon-btn:hover {
+    transform: none !important;
+    animation: none !important;
+  }
+  .sheet[open], .toast, .quiz-feedback, .lesson-step, .edit-bar { animation: fade-in 0.2s ease-out !important; }
+  .mover.is-walking .avatar-figure, .mover--mochi.is-walking .mochi-figure, .room.is-editing .decor-item, .bulb, .fish, .visitor-badge, .mover--visitor.is-walking .avatar-figure { animation: none !important; }
+  .sheet.is-closing, .toast.is-leaving { animation: fade-out 0.15s ease-out forwards !important; }
+  .star-pill.is-bumped { animation: none; outline: 3px solid var(--butter-deep); }
+}
+@keyframes fade-in { from { opacity: 0; } }
+@keyframes fade-out { to { opacity: 0; } }
+
+/* Permukaan bawaan browser ikut palet */
+::selection { background: var(--butter); color: var(--cocoa); }
+html { scrollbar-color: var(--shadow-soft) transparent; accent-color: var(--pink); caret-color: var(--cocoa); }

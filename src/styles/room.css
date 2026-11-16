@@ -1,0 +1,203 @@
+.stage-wrap {
+  position: relative;
+  min-height: 0;
+  display: grid;
+  /* Kamar sedikit naik ke belakang HUD agar layar terasa penuh */
+  margin-top: -64px;
+}
+
+/* Dunia kamar lebih lebar dari layar → digeser horizontal (jari, trackpad, roda, atau berjalan). */
+.stage {
+  min-height: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+}
+.stage::-webkit-scrollbar { display: none; }
+
+.room {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Hiasan lantai tidak menghalangi ketukan untuk berjalan */
+#room-rug, #room-rug2, #room-shadows, #room-nightstand, #room-floor-plant, #room-sunlight, #room-study-board { pointer-events: none; }
+.walk-surface { cursor: pointer; }
+
+/* ───────── Tombol jalan ◀ ▶ ───────── */
+.move-pad {
+  position: absolute;
+  inset: auto 0 max(14px, env(safe-area-inset-bottom)) 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 var(--gutter);
+  pointer-events: none;
+}
+.move-btn {
+  pointer-events: auto;
+  width: 72px;
+  height: 72px;
+  display: grid;
+  place-items: center;
+  border: var(--border);
+  border-radius: 50%;
+  background: var(--card);
+  box-shadow: var(--lift-toy);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  transition: transform 0.1s var(--ease-out), box-shadow 0.1s, background-color 0.15s;
+}
+.move-btn svg { width: 38px; height: 38px; }
+.move-btn.is-held, .move-btn:active { transform: translateY(3px); box-shadow: var(--lift-toy-pressed); background: var(--butter); }
+.is-decor-editing .move-pad { display: none; }
+
+/* ───────── Berjalan ───────── */
+.mover.is-walking .avatar-figure { animation: walk-bob 0.42s ease-in-out infinite; }
+.mover--mochi.is-walking .mochi-figure { animation: walk-bob 0.3s ease-in-out infinite; }
+@keyframes walk-bob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25% { transform: translateY(-9px) rotate(-3deg); }
+  50% { transform: translateY(0) rotate(0deg); }
+  75% { transform: translateY(-9px) rotate(3deg); }
+}
+
+/* ───────── Dekorasi di kamar ───────── */
+.decor-item {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.3s var(--ease-bounce), filter 0.2s;
+  outline: none;
+}
+.room:not(.is-editing) .decor-item:hover { transform: translateY(-4px) scale(1.03); }
+.room.is-editing .hotspot,
+.room.is-editing .walk-surface { pointer-events: none; }
+.room.is-editing .hotspot { opacity: 0.8; }
+.room.is-editing .decor-pos { cursor: grab; touch-action: none; }
+.room.is-editing .decor-item { animation: jiggle 1.6s ease-in-out infinite; }
+.decor-pos.is-selected .decor-item,
+.room.is-editing .decor-item:focus-visible { filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 7px var(--focus)); animation: none; }
+.decor-pos.is-dragging { cursor: grabbing; }
+.decor-pos.is-dragging .decor-item { transform: scale(1.06) translateY(-6px); animation: none; }
+@keyframes jiggle { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-1.5deg); } 75% { transform: rotate(1.5deg); } }
+.bulb { animation: bulb 1.8s ease-in-out infinite alternate; }
+@keyframes bulb { from { opacity: 0.75; } to { opacity: 1; } }
+
+/* Bilah mode atur dekorasi */
+.edit-bar {
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: max(16px, env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  width: min(640px, calc(100vw - 2 * var(--gutter)));
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  border: var(--border);
+  border-radius: var(--radius-card);
+  background: var(--card);
+  box-shadow: 0 6px 0 var(--cocoa);
+  animation: toast-in 0.3s var(--ease-bounce);
+}
+.edit-bar[hidden] { display: none; }
+.edit-bar__msg { flex: 1 1 220px; font-weight: 700; }
+.is-decor-editing .dock { visibility: hidden; }
+
+/* ───────── Hotspot (benda yang bisa diklik) ───────── */
+.hotspot {
+  cursor: pointer;
+  outline: none;
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform 0.35s var(--ease-bounce), filter 0.2s;
+}
+.hotspot:hover,
+.hotspot:focus-visible { transform: translateY(-6px) scale(1.025); }
+.hotspot.is-squished { animation: squish 0.26s var(--ease-out); }
+
+@keyframes squish {
+  45% { transform: scale(1.04, 0.95); }
+}
+
+/* Cincin fokus keyboard pada label stiker */
+.hotspot:focus-visible .tag__bg { stroke: var(--focus); stroke-width: 7; }
+
+.tag { transition: transform 0.35s var(--ease-bounce); }
+.tag__text {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 600;
+  fill: var(--cocoa);
+}
+.hotspot:hover .tag__bg,
+.hotspot:focus-visible .tag__bg { fill: var(--butter); }
+
+/* Petunjuk pertama: label rak buku sesekali "melambai" */
+.hotspot[data-action="subjects"] .tag__bg,
+.hotspot[data-action="subjects"] .tag__text,
+.hotspot[data-action="subjects"] .tag__shadow {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+}
+.hotspot[data-action="subjects"]:not(:hover) .tag > * { animation: nudge 5s ease-in-out 2s infinite; }
+@keyframes nudge {
+  0%, 88%, 100% { transform: none; }
+  92% { transform: translateY(-8px) rotate(-3deg); }
+  96% { transform: translateY(0) rotate(2deg); }
+}
+
+/* Avatar & Mochi: hover cukup naik sedikit, tanpa membesar */
+.hotspot--avatar:hover,
+.hotspot--pet:hover,
+.hotspot--avatar:focus-visible,
+.hotspot--pet:focus-visible { transform: translateY(-4px); }
+.hotspot.is-hopping { animation: hop 0.52s var(--ease-out); }
+@keyframes hop {
+  30% { transform: translateY(-26px) scale(0.98, 1.03); }
+  60% { transform: translateY(0) scale(1.04, 0.95); }
+  80% { transform: translateY(-4px); }
+}
+.hotspot--avatar:focus-visible .avatar-figure,
+.hotspot--pet:focus-visible .mochi-figure { filter: drop-shadow(0 0 0 #fff) drop-shadow(0 0 6px var(--focus)); }
+
+/* Gerak idle karakter: bernapas & berkedip */
+.room-avatar .avatar-figure,
+.room-mochi .mochi-figure,
+.mirror .avatar-figure {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: breathe 3.4s ease-in-out infinite;
+}
+.room-mochi .mochi-figure { animation-duration: 2.6s; }
+.room-avatar .layer-eyes,
+.mirror .layer-eyes {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: blink 5s infinite;
+}
+@keyframes breathe { 50% { transform: scale(1.012, 0.988); } }
+@keyframes blink {
+  0%, 93%, 100% { transform: scaleY(1); }
+  95.5% { transform: scaleY(0.1); }
+}
+
+/* Detail hidup di kamar */
+.beam { animation: shimmer 7s ease-in-out infinite; }
+.beam--late { animation-delay: -3.5s; }
+@keyframes shimmer { 50% { opacity: 0.55; } }
+
+.cursor-blink { animation: cursor 1.1s steps(1) infinite; }
+@keyframes cursor { 50% { opacity: 0; } }
+
+.sway { transform-box: fill-box; transform-origin: 50% 0; animation: sway 6s ease-in-out infinite; }
+@keyframes sway { 50% { transform: rotate(0.6deg); } }
+/* Saat mode atur, toast naik di atas bilah supaya tidak saling menutup */
+.is-decor-editing .toast-region { bottom: calc(120px + env(safe-area-inset-bottom)); }

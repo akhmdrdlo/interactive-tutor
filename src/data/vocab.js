@@ -1,0 +1,130 @@
+/**
+ * Set Kartu Kosakata. front = kata yang dipelajari, back = artinya, example = contoh pemakaian.
+ * langName dipakai di kuis: "Apa bahasa {langName} dari …?"
+ */
+const en = (id, title, cards) => ({ id, subject: 'bahasa-inggris', lang: 'en', langName: 'Inggris', title, cards });
+const su = (id, title, cards) => ({ id, subject: 'basa-sunda', lang: 'su', langName: 'Sunda', title, cards });
+const idn = (id, title, cards, langName = 'Indonesia') => ({ id, subject: 'bahasa-indonesia', lang: 'id', langName, title, cards });
+
+export const VOCAB_SETS = [
+  en('en-taste', 'Tastes & Food (Unit 1–2)', [
+    { front: 'sweet', back: 'manis', example: 'Honey is sweet.' },
+    { front: 'sour', back: 'asam', example: 'Limes are sour.' },
+    { front: 'salty', back: 'asin', example: 'Salty fish is salty.' },
+    { front: 'bitter', back: 'pahit', example: 'Coffee is bitter.' },
+    { front: 'delicious', back: 'lezat', example: 'What delicious bakso!' },
+    { front: 'glass', back: 'gelas', example: 'a glass of water' },
+    { front: 'bowl', back: 'mangkuk', example: 'a bowl of soup' },
+    { front: 'plate', back: 'piring', example: 'a plate of rice' },
+    { front: 'slice', back: 'potong', example: 'a slice of cake' },
+    { front: 'bottle', back: 'botol', example: 'a bottle of milk' },
+  ]),
+  en('en-shop', 'Shopping & Numbers (Unit 3)', [
+    { front: 'How much is it?', back: 'Berapa harganya?', example: 'How much is it? It is five thousand rupiahs.' },
+    { front: 'hundred', back: 'ratus', example: 'five hundred rupiahs' },
+    { front: 'thousand', back: 'ribu', example: 'two thousand rupiahs' },
+    { front: 'fifteen', back: 'lima belas', example: 'fifteen thousand' },
+    { front: 'fifty', back: 'lima puluh', example: 'fifty thousand' },
+    { front: 'canteen', back: 'kantin', example: 'I buy bakso at the canteen.' },
+    { front: 'cheap', back: 'murah', example: 'The candy is cheap.' },
+    { front: 'expensive', back: 'mahal', example: 'The bag is expensive.' },
+  ]),
+  en('en-health', 'Feeling Sick (Unit 4)', [
+    { front: 'stomachache', back: 'sakit perut', example: "I've got a stomachache." },
+    { front: 'headache', back: 'sakit kepala', example: "I've got a headache." },
+    { front: 'toothache', back: 'sakit gigi', example: "I've got a toothache." },
+    { front: 'cough', back: 'batuk', example: "I've got a cough." },
+    { front: 'medicine', back: 'obat', example: 'Take your medicine.' },
+    { front: 'Get well soon!', back: 'Semoga cepat sembuh!', example: 'Get well soon, my friend!' },
+  ]),
+  en('en-clothes', 'Clothes (Unit 5)', [
+    { front: 'skirt', back: 'rok', example: 'What a nice skirt!' },
+    { front: 'T-shirt', back: 'kaus', example: 'He is wearing a T-shirt.' },
+    { front: 'dress', back: 'gaun', example: 'She is wearing a pink dress.' },
+    { front: 'trousers', back: 'celana panjang', example: 'My trousers are blue.' },
+    { front: 'hat', back: 'topi', example: 'I wear a hat.' },
+    { front: 'shoes', back: 'sepatu', example: 'My shoes are new.' },
+    { front: 'jacket', back: 'jaket', example: 'Wear your jacket. It is cold.' },
+  ]),
+  en('en-body', 'Body Parts (Unit 6)', [
+    { front: 'eyes', back: 'mata', example: 'We use our eyes to see.' },
+    { front: 'ears', back: 'telinga', example: 'We use our ears to hear.' },
+    { front: 'nose', back: 'hidung', example: 'We use our nose to smell.' },
+    { front: 'mouth', back: 'mulut', example: 'We use our mouth to eat.' },
+    { front: 'hands', back: 'tangan', example: 'We use our hands to hold.' },
+    { front: 'legs', back: 'kaki', example: 'We use our legs to walk.' },
+    { front: 'trunk', back: 'belalai', example: 'The elephant uses his trunk.' },
+  ]),
+  en('en-compare', 'Describing & Comparing (Unit 7–9)', [
+    { front: 'tall', back: 'tinggi', example: 'The giraffe is tall.' },
+    { front: 'short', back: 'pendek', example: 'Mochi is short.' },
+    { front: 'big', back: 'besar', example: 'The elephant is big.' },
+    { front: 'small', back: 'kecil', example: 'The ant is small.' },
+    { front: 'taller than', back: 'lebih tinggi daripada', example: 'The giraffe is taller than the deer.' },
+    { front: 'bigger than', back: 'lebih besar daripada', example: 'The elephant is bigger than the cat.' },
+    { front: 'the biggest', back: 'paling besar', example: 'The elephant is the biggest.' },
+    { front: 'the smallest', back: 'paling kecil', example: 'The ant is the smallest.' },
+  ]),
+  en('en-months', 'Months & Games (Unit 10)', [
+    { front: 'January', back: 'Januari', example: 'New Year is on January 1st.' },
+    { front: 'March', back: 'Maret', example: 'My birthday is on March 22nd.' },
+    { front: 'August', back: 'Agustus', example: 'Independence Day is on August 17th.' },
+    { front: 'December', back: 'Desember', example: 'December is the last month.' },
+    { front: 'birthday', back: 'ulang tahun', example: 'When is your birthday?' },
+    { front: 'sack race', back: 'balap karung', example: 'I like playing sack race.' },
+  ]),
+
+  su('su-ulin', 'Kaulinan & Sakola', [
+    { front: 'ulin', back: 'bermain', example: 'Hayu urang ulin!' },
+    { front: 'kaulinan', back: 'permainan', example: 'Congklak téh kaulinan barudak.' },
+    { front: 'babaturan', back: 'teman', example: 'Kuring ulin jeung babaturan.' },
+    { front: 'diajar', back: 'belajar', example: 'Urang diajar babarengan.' },
+    { front: 'sakola', back: 'sekolah', example: 'Kuring indit ka sakola.' },
+    { front: 'langlayangan', back: 'layang-layang', example: 'Adun maénkeun langlayangan.' },
+    { front: 'paséa', back: 'bertengkar', example: 'Ulah paséa jeung babaturan.' },
+  ]),
+  su('su-imah', 'Kadaharan & Kulawarga', [
+    { front: 'sangu', back: 'nasi', example: 'Kuring dahar sangu.' },
+    { front: 'endog', back: 'telur', example: 'Endog loba protéinna.' },
+    { front: 'cai', back: 'air', example: 'Nginum cai bodas.' },
+    { front: 'dahar', back: 'makan', example: 'Hayu urang dahar!' },
+    { front: 'Ema', back: 'Ibu', example: 'Ema keur masak.' },
+    { front: 'Bapa', back: 'Ayah', example: 'Bapa indit ka kebon.' },
+    { front: 'adi', back: 'adik', example: 'Adi kuring bageur.' },
+  ]),
+  su('su-sipat', 'Kecap Sipat & Sabalikna', [
+    { front: 'geulis', back: 'cantik', example: 'Dewi geulis.' },
+    { front: 'bageur', back: 'baik hati', example: 'Adi bageur.' },
+    { front: 'pinter', back: 'pintar', example: 'Budak éta pinter.' },
+    { front: 'gedé', back: 'besar', example: 'Imahna gedé.' },
+    { front: 'leutik', back: 'kecil', example: 'Ucingna leutik.' },
+    { front: 'beurat', back: 'berat', example: 'Tasna beurat.' },
+    { front: 'hampang', back: 'ringan', example: 'Bukuna hampang.' },
+    { front: 'tiis', back: 'dingin', example: 'Caina tiis.' },
+  ]),
+  su('su-alam', 'Alam & Lingkungan', [
+    { front: 'walungan', back: 'sungai', example: 'Ulah miceun runtah ka walungan.' },
+    { front: 'leuweung', back: 'hutan', example: 'Leuweung kudu dijaga.' },
+    { front: 'hulu cai', back: 'mata air', example: 'Hulu cai aya di gunung.' },
+    { front: 'runtah', back: 'sampah', example: 'Piceun runtah kana tempatna.' },
+    { front: 'caah', back: 'banjir', example: 'Caah kajadian dina usum hujan.' },
+    { front: 'tatangkalan', back: 'pepohonan', example: 'Hayu melak tatangkalan.' },
+  ]),
+
+  idn('id-sinonim', 'Sinonim (persamaan kata)', [
+    { front: 'pintar', back: 'pandai', example: 'Rani anak yang pintar.' },
+    { front: 'gembira', back: 'senang', example: 'Kami gembira bermain bersama.' },
+    { front: 'indah', back: 'elok', example: 'Pemandangannya indah.' },
+    { front: 'cepat', back: 'lekas', example: 'Ayo cepat berangkat!' },
+    { front: 'besar', back: 'raya', example: 'Jalan besar itu ramai.' },
+    { front: 'sayembara', back: 'lomba', example: 'Ia ikut sayembara menggambar.' },
+  ], 'Indonesia (sinonim)'),
+  idn('id-antonim', 'Antonim (lawan kata)', [
+    { front: 'mahal', back: 'murah', example: 'Tas itu mahal, buku ini murah.' },
+    { front: 'cepat', back: 'lambat', example: 'Kelinci cepat, kura-kura lambat.' },
+    { front: 'tinggi', back: 'rendah', example: 'Gunung tinggi, lembah rendah.' },
+    { front: 'rajin', back: 'malas', example: 'Anak rajin disayang guru.' },
+    { front: 'berani', back: 'takut', example: 'Ia berani tampil di depan kelas.' },
+    { front: 'fakta', back: 'opini', example: 'Fakta bisa dibuktikan, opini adalah pendapat.' },
+  ], 'Indonesia (lawan kata)'),
+];
