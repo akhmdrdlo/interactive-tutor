@@ -10,6 +10,7 @@ import { icon } from '../ui/icons.js';
 import { toast, starBurst } from '../ui/feedback.js';
 import { renderAvatar, colorsFor, CROP } from '../character/avatar.js';
 import { WARDROBE, SKIN_TONES } from '../data/wardrobe.js';
+import { markMission } from '../core/missions.js';
 
 const TABS = [
   { id: 'hair', label: 'Rambut' },
@@ -19,6 +20,7 @@ const TABS = [
 ];
 
 export function openWardrobe() {
+  markMission('wardrobe');
   openSheet({
     title: 'Lemari Baju',
     tone: 'peach',

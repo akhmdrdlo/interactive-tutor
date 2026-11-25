@@ -107,13 +107,13 @@ export function frameArt() {
 
 /** Bayangan kontak datar (tanpa blur) agar benda "menapak" lantai. */
 export function contactShadows() {
-  return `<g id="room-shadows" fill="${C.cocoa}" opacity="0.08">
+  return `<g id="room-shadows" fill="${C.cocoa}" opacity="0.12">
     <ellipse cx="530" cy="724" rx="140" ry="14"/>
     <ellipse cx="1245" cy="724" rx="150" ry="14"/>
     <ellipse cx="1440" cy="722" rx="56" ry="10"/>
     <ellipse cx="1640" cy="726" rx="160" ry="14"/>
-    <ellipse cx="2225" cy="726" rx="250" ry="14"/>
-    <ellipse cx="2540" cy="724" rx="70" ry="10"/>
+    <ellipse cx="2255" cy="726" rx="280" ry="14"/>
+    <ellipse cx="2606" cy="724" rx="70" ry="10"/>
     <ellipse cx="2920" cy="724" rx="70" ry="10"/>
     <ellipse cx="3350" cy="726" rx="250" ry="14"/>
   </g>`;
@@ -309,22 +309,31 @@ export function bed() {
   const hearts = [[2210, 624], [2290, 640], [2370, 622], [2250, 660], [2340, 664]]
     .map(([x, y]) => `<path d="M${x} ${y + 7} C${x - 10} ${y} ${x - 8} ${y - 8} ${x} ${y - 3} C${x + 8} ${y - 8} ${x + 10} ${y} ${x} ${y + 7} Z" fill="#fff" opacity="0.85"/>`).join('');
   return `<g class="hotspot__art">
+    <!-- lampu tumbler & rak dinding di atas kasur -->
+    <path d="M1990 250 Q2120 300 2250 262 Q2380 300 2500 252" fill="none" stroke="${C.cocoa}" stroke-width="3" stroke-linecap="round"/>
+    ${[2030, 2090, 2150, 2210, 2290, 2350, 2410, 2470].map((x, i) => { const y = x < 2250 ? 250 + 40 * Math.sin((x - 1990) / 260 * Math.PI) : 262 + 32 * Math.sin((x - 2250) / 250 * Math.PI); return `<circle cx="${x}" cy="${y + 10}" r="9" fill="${[C.butter, C.pink, C.sky, C.mint][i % 4]}" ${RO3}/>`; }).join('')}
+    <rect x="2120" y="400" width="260" height="18" rx="6" fill="${C.wood}" ${RO3}/>
+    <path d="M2150 418 l14 26 M2350 418 l-14 26" stroke="${C.woodDeep}" stroke-width="6" stroke-linecap="round"/>
+    <rect x="2142" y="352" width="22" height="48" rx="4" fill="${C.sky}" ${RO3}/><rect x="2166" y="360" width="20" height="40" rx="4" fill="${C.butter}" ${RO3}/>
+    <circle cx="2250" cy="372" r="24" fill="${C.peach}" ${RO3}/><circle cx="2234" cy="350" r="9" fill="${C.peach}" ${RO3}/><circle cx="2266" cy="350" r="9" fill="${C.peach}" ${RO3}/>
+    <circle cx="2242" cy="368" r="3" fill="${C.cocoa}"/><circle cx="2258" cy="368" r="3" fill="${C.cocoa}"/>
+    <path d="M2316 400 l10 -40 h28 l10 40 z" fill="${C.pink}" ${RO3}/><path d="M2340 360 c-14 -20 -6 -34 0 -36 c6 2 14 16 0 36" fill="${C.mint}" ${RO3}/>
     <rect x="2028" y="696" width="24" height="28" rx="6" fill="${C.woodDeep}" ${RO3}/>
-    <rect x="2398" y="696" width="24" height="28" rx="6" fill="${C.woodDeep}" ${RO3}/>
+    <rect x="2458" y="696" width="24" height="28" rx="6" fill="${C.woodDeep}" ${RO3}/>
     <rect x="1990" y="470" width="50" height="252" rx="22" fill="${C.wood}" ${RO}/>
     <circle cx="2015" cy="462" r="16" fill="${C.butter}" ${RO3}/>
-    <rect x="2424" y="572" width="42" height="150" rx="18" fill="${C.wood}" ${RO}/>
-    <rect x="2024" y="648" width="420" height="52" rx="14" fill="${C.woodLight}" ${RO}/>
-    <rect x="2034" y="602" width="398" height="54" rx="20" fill="${C.card}" ${RO}/>
+    <rect x="2484" y="560" width="42" height="162" rx="18" fill="${C.wood}" ${RO}/>
+    <rect x="2024" y="640" width="480" height="60" rx="14" fill="${C.woodLight}" ${RO}/>
+    <rect x="2034" y="590" width="458" height="60" rx="20" fill="${C.card}" ${RO}/>
     <path d="M2046 600 C2040 576 2062 566 2090 570 C2122 566 2142 578 2136 600 C2140 618 2120 626 2090 622 C2060 626 2040 618 2046 600 Z" fill="#fff" ${RO3}/>
-    <path d="M2154 590 Q2292 572 2434 592 L2434 672 Q2292 694 2154 672 Z" fill="${C.pink}" ${RO}/>
+    <path d="M2154 580 Q2320 560 2494 582 L2494 676 Q2320 700 2154 676 Z" fill="${C.pink}" ${RO}/>
     ${hearts}
-    <path d="M2154 600 Q2168 636 2154 672" fill="none" stroke="${C.pinkHover}" stroke-width="5" stroke-linecap="round"/>
+    <path d="M2154 590 Q2170 630 2154 676" fill="none" stroke="${C.pinkHover}" stroke-width="5" stroke-linecap="round"/>
   </g>`;
 }
 
 export function nightstand() {
-  return `<g id="room-nightstand">
+  return `<g id="room-nightstand" transform="translate(60 0)">
     <rect x="2494" y="604" width="104" height="118" rx="12" fill="${C.woodLight}" ${RO}/>
     <rect x="2506" y="622" width="80" height="40" rx="8" fill="${C.woodLight}" ${RO3}/>
     <circle cx="2546" cy="642" r="6" fill="${C.mint}" ${RO3}/>

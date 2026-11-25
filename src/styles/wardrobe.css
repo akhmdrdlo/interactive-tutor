@@ -6,7 +6,9 @@
 }
 @media (max-width: 680px) {
   .wardrobe { grid-template-columns: 1fr; }
-  .mirror__frame { max-width: 220px; margin-inline: auto; }
+  /* HP: cermin tidak ikut melayang menimpa daftar baju saat digulir. */
+  .wardrobe .mirror { position: static; }
+  .mirror__frame { max-width: 200px; margin-inline: auto; }
 }
 
 /* ───────── Cermin ───────── */

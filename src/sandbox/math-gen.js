@@ -18,6 +18,7 @@ export const MATH_TOPICS = [
   { id: 'kpk-fpb', title: 'KPK & FPB', blurb: 'Kelipatan dan faktor' },
   { id: 'pecahan', title: 'Pecahan', blurb: 'Jumlah & kurang berpenyebut sama' },
   { id: 'keliling-luas', title: 'Keliling & Luas', blurb: 'Persegi dan persegi panjang' },
+  { id: 'uang', title: 'Belanja di Pasar', blurb: 'Harga, jumlah, dan uang kembalian' },
 ];
 
 const GEN = {
@@ -83,6 +84,18 @@ const GEN = {
       ? { type: 'number', prompt: `Luas persegi panjang ${p} cm × ${l} cm adalah …`, answer: p * l, unit: 'cm²', hint: 'Luas persegi panjang = panjang × lebar.' }
       : { type: 'number', prompt: `Keliling persegi panjang ${p} cm × ${l} cm adalah …`, answer: 2 * (p + l), unit: 'cm', hint: 'Keliling persegi panjang = 2 × (panjang + lebar).' };
   },
+};
+
+const ITEMS = [['apel', 2500], ['jeruk', 1500], ['roti', 4000], ['telur', 2000], ['pisang', 1000], ['susu kotak', 5000], ['kue serabi', 3000]];
+GEN.uang = () => {
+  const [name, price] = ITEMS[rand(0, ITEMS.length - 1)];
+  const qty = rand(2, 6);
+  const total = price * qty;
+  if (Math.random() < 0.5) {
+    return { type: 'number', prompt: `Harga 1 ${name} Rp${fmt(price)}. Ibu membeli ${qty} ${name}. Berapa rupiah yang harus dibayar?`, answer: total, hint: `Kalikan harga dengan jumlah: ${fmt(price)} × ${qty}.` };
+  }
+  const pay = total <= 10000 ? 10000 : total <= 20000 ? 20000 : 50000;
+  return { type: 'number', prompt: `Kamu membeli ${qty} ${name} seharga Rp${fmt(price)} per buah dan membayar Rp${fmt(pay)}. Berapa uang kembalianmu?`, answer: pay - total, hint: `Hitung total dulu (${fmt(price)} × ${qty}), lalu ${fmt(pay)} dikurangi total.` };
 };
 
 export function makeMathQuestion(topicId) {

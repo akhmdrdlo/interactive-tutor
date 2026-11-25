@@ -10,6 +10,7 @@ import { openSheet } from '../ui/sheet.js';
 import { icon } from '../ui/icons.js';
 import { toast } from '../ui/feedback.js';
 import { runSession } from './session.js';
+import { markMission } from '../core/missions.js';
 
 const O = `stroke="${C.cocoa}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"`;
 
@@ -37,6 +38,7 @@ const PINS = [
 ];
 
 export function openMap({ onBack } = {}) {
+  markMission('map');
   openSheet({
     title: 'Peta Indonesia',
     tone: 'sky',
@@ -53,13 +55,35 @@ export function openMap({ onBack } = {}) {
             <rect width="1000" height="400" rx="24" fill="${C.sky}" opacity="0.55"/>
             <path d="M0 330 Q500 300 1000 340" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="10 12" opacity="0.8"/>
             <text x="20" y="390" font-family="Fredoka, sans-serif" font-size="18" fill="${C.inkSoft}">Samudra Hindia</text>
-            <text x="820" y="40" font-family="Fredoka, sans-serif" font-size="18" fill="${C.inkSoft}">Samudra Pasifik</text>
+            <text x="690" y="40" font-family="Fredoka, sans-serif" font-size="18" fill="${C.inkSoft}">Samudra Pasifik</text>
             <text x="440" y="20" font-family="Fredoka, sans-serif" font-size="14" fill="${C.inkSoft}">garis khatulistiwa</text>
             <line x1="0" y1="140" x2="1000" y2="140" stroke="${C.butterDeep}" stroke-width="2.5" stroke-dasharray="6 8"/>
             ${ISLANDS.map((i) => `<path class="island" data-island="${i.id}" d="${i.d}" fill="${C.mint}" ${O} role="button" tabindex="0" aria-label="${esc(i.name)}"/>`).join('')}
+            <g transform="translate(940 90)" aria-label="Mata angin">
+              <circle r="34" fill="#fff" ${O}/>
+              <path d="M0 -28 L7 0 L0 28 L-7 0 Z" fill="${C.pink}" ${O}/>
+              <path d="M-28 0 L0 -6 L28 0 L0 6 Z" fill="${C.linen}" stroke="${C.cocoa}" stroke-width="2"/>
+              <text y="-40" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="18" fill="${C.cocoa}">U</text>
+              <text y="54" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="${C.cocoa}">S</text>
+              <text x="44" y="6" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="${C.cocoa}">T</text>
+              <text x="-44" y="6" text-anchor="middle" font-family="Fredoka, sans-serif" font-weight="700" font-size="16" fill="${C.cocoa}">B</text>
+            </g>
+            <g transform="translate(760 372)" aria-hidden="true">
+              <rect width="60" height="8" fill="${C.cocoa}"/><rect x="60" width="60" height="8" fill="#fff" stroke="${C.cocoa}" stroke-width="2"/>
+              <text y="-6" font-family="Fredoka, sans-serif" font-size="13" fill="${C.inkSoft}">skala sederhana: 1 kotak ± 500 km</text>
+            </g>
             ${PINS.map((p) => `<g transform="translate(${p.x} ${p.y})" aria-hidden="true"><path d="M0 -14 L4 -4 L14 -3 L6 4 L9 14 L0 8 L-9 14 L-6 4 L-14 -3 L-4 -4 Z" fill="${C.butter}" ${O}/></g>`).join('')}
           </svg>
           <div class="map__info" data-info aria-live="polite"><p>Pilih sebuah pulau di peta.</p></div>
+        </div>
+        <div class="map__tools">
+          <ul class="map__legend" aria-label="Legenda peta">
+            <li><i style="background:${C.sky}"></i>Laut / perairan</li>
+            <li><i style="background:${C.mint}"></i>Daratan (pulau)</li>
+            <li><i class="is-line"></i>Garis khatulistiwa</li>
+            <li><i class="is-star"></i>Ujung Indonesia</li>
+          </ul>
+          <button type="button" class="btn btn--primary" data-mapquiz>Kuis Peta</button>
         </div>
         <ul class="map__pins">${PINS.map((p) => `<li><b>Ujung ${p.dir}:</b> ${esc(p.name)}</li>`).join('')}</ul>`;
 
@@ -75,14 +99,51 @@ export function openMap({ onBack } = {}) {
           toast(earned ? `Kamu menjelajahi seluruh Indonesia! +${earned} bintang` : 'Penjelajah hebat!', { tone: 'mint' });
         }
       }
+      // Kuis Peta: pertanyaan acak dari fakta pulau
+      const CLUES = [
+        ['sumatra', 'Ketuk pulau tempat Pulau Rondo, ujung barat Indonesia!'],
+        ['sumatra', 'Di pulau mana provinsi Lampung (makanan Seruit) berada?'],
+        ['jawa', 'Ketuk pulau tempat tanah Sunda dan angklung!'],
+        ['jawa', 'Candi Borobudur ada di pulau …'],
+        ['kalimantan', 'Pasar Terapung Lok Baintan ada di pulau …'],
+        ['sulawesi', 'Pulau Miangas, ujung utara Indonesia, termasuk provinsi di pulau …'],
+        ['sulawesi', 'Tari Saronde dari Gorontalo berasal dari pulau …'],
+        ['nusa', 'Alat musik Sasando berasal dari kepulauan …'],
+        ['maluku', 'Tari Cakalele dan lagu Rasa Sayange berasal dari …'],
+        ['papua', 'Merauke, ujung timur Indonesia, ada di pulau …'],
+      ];
+      let quiz = null;
+      function nextClue() {
+        const pool = CLUES.filter((c) => c !== quiz?.clue);
+        const clue = pool[Math.floor(Math.random() * pool.length)];
+        quiz = { clue, round: (quiz?.round ?? 0) + 1, right: quiz?.right ?? 0, tries: 0 };
+        body.querySelector('[data-info]').innerHTML = `<p class="ask__prompt">Kuis Peta ${quiz.round}/5</p><p class="story__text">${esc(clue[1])}</p>`;
+      }
+      function answer(id) {
+        const ok = id === quiz.clue[0];
+        quiz.tries += 1;
+        body.querySelectorAll('.island').forEach((p) => p.classList.toggle('is-active', p.dataset.island === id));
+        if (!ok) { sfx.nudge(); body.querySelector('[data-info]').insertAdjacentHTML('beforeend', '<p class="map__hint">Belum tepat, coba pulau lain!</p>'); return; }
+        sfx.success();
+        if (quiz.tries === 1) quiz.right += 1;
+        if (quiz.round >= 5) {
+          const earned = store.awardDaily('practice', Math.floor(quiz.right / 2), 10);
+          body.querySelector('[data-info]').innerHTML = `<p class="ask__prompt">Kuis Peta selesai! ${quiz.right}/5 benar langsung.</p><p>${earned ? `Bonus <b>${earned} bintang</b>.` : 'Hebat, penjelajah!'}</p>`;
+          quiz = null;
+          return;
+        }
+        setTimeout(nextClue, 700);
+      }
+
       body.addEventListener('click', (e) => {
         if (e.target.closest('[data-back]')) { sfx.pop(); onBack?.(); return; }
+        if (e.target.closest('[data-mapquiz]')) { sfx.pop(); quiz = null; nextClue(); return; }
         const isl = e.target.closest('[data-island]');
-        if (isl) show(isl.dataset.island);
+        if (isl) (quiz ? answer(isl.dataset.island) : show(isl.dataset.island));
       });
       body.addEventListener('keydown', (e) => {
         const isl = e.target.closest('[data-island]');
-        if (isl && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); show(isl.dataset.island); }
+        if (isl && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); (quiz ? answer(isl.dataset.island) : show(isl.dataset.island)); }
       });
     },
   });

@@ -15,6 +15,7 @@ import { SUBJECTS } from '../data/subjects.js';
 import { pickQuestions } from '../data/question-pool.js';
 import { runSession } from '../sandbox/session.js';
 import { WORLD } from '../core/world.js';
+import { markMission } from '../core/missions.js';
 
 const FIRST_VISIT_MS = [40_000, 70_000];
 const NEXT_VISIT_MS = [150_000, 270_000];
@@ -209,6 +210,7 @@ function openVisit(visitor) {
           questions: picked.map((p) => ({ quiz: p.quiz, subjectId: p.subject?.id, tag: `${p.subject?.title ?? ''} · ${p.chapter}` })),
           onFinish: (first) => {
             const earned = store.awardDaily('visits', 2 + first, VISIT_CAP);
+            markMission('visit');
             return {
               title: `${visitor.name}: "${first === 3 ? 'Wah, semuanya benar!' : 'Hebat, kamu sudah berusaha!'}"`,
               message: earned ? `Bonus tamu: <b>${earned} bintang</b>!` : 'Bonus tamu hari ini sudah penuh, tapi latihanmu tetap berharga!',

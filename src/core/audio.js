@@ -15,11 +15,16 @@ function audio() {
     master.gain.value = 0.5;
     master.connect(ctx.destination);
   }
-  if (ctx.state === 'suspended') ctx.resume();
+  if (ctx.state === 'suspended') ctx.resume()?.catch?.(() => {});
   return ctx;
 }
 
-function tone({ freq, to, dur = 0.14, type = 'sine', gain = 0.16, delay = 0 }) {
+function tone(opts) {
+  // Suara hanya hiasan: browser HP dengan Web Audio tidak lengkap tidak boleh membuat aplikasi macet.
+  try { toneUnsafe(opts); } catch { enabled = false; }
+}
+
+function toneUnsafe({ freq, to, dur = 0.14, type = 'sine', gain = 0.16, delay = 0 }) {
   if (!enabled) return;
   const c = audio();
   if (!c) return;

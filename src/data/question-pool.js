@@ -6,6 +6,7 @@ import { SUBJECTS } from './subjects.js';
 import { shuffle } from '../quiz/shuffle.js';
 import { makeMathQuestion, MATH_TOPICS } from '../sandbox/math-gen.js';
 import { store } from '../core/store.js';
+import { loadBank } from './questions/index.js';
 
 let cache = null;
 
@@ -14,8 +15,11 @@ export async function loadPool() {
   if (cache) return cache;
   const entries = await Promise.all(SUBJECTS.filter((s) => s.load).map(async (subject) => {
     const data = (await subject.load()).default;
-    return data.chapters.flatMap((chapter) => chapter.lessons.flatMap((lesson) =>
-      lesson.quiz.map((quiz) => ({ quiz, subject, chapter: chapter.title, lesson: lesson.title }))));
+    const bank = await loadBank(subject.id);
+    return data.chapters.flatMap((chapter) => [
+      ...chapter.lessons.flatMap((lesson) => lesson.quiz.map((quiz) => ({ quiz, subject, chapter: chapter.title, lesson: lesson.title }))),
+      ...(bank[chapter.id] ?? []).map((quiz) => ({ quiz, subject, chapter: chapter.title, lesson: 'Bank Soal' })),
+    ]);
   }));
   cache = entries.flat();
   return cache;

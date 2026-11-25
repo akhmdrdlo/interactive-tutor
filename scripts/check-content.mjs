@@ -8,6 +8,9 @@ import path from 'node:path';
 
 const dir = path.resolve('src/data/subjects');
 const files = (await readdir(dir)).filter((f) => f.endsWith('.js') && !f.startsWith('_'));
+const dir6 = path.resolve('src/data/kelas6');
+const files6 = (await readdir(dir6)).filter((f) => f.endsWith('.js') && !f.startsWith('_'));
+let lessons6 = 0;
 const problems = [];
 const seenLessonIds = new Map();
 let lessonCount = 0;
@@ -15,9 +18,9 @@ let quizCount = 0;
 
 const QUIZ_TYPES = new Set(['multiple-choice', 'drag-match', 'sequence']);
 
-for (const file of files) {
-  const { default: subject } = await import(pathToFileURL(path.join(dir, file)).href);
-  const where = (...parts) => [file, ...parts].join(' › ');
+for (const [base, file] of [...files.map((f) => [dir, f]), ...files6.map((f) => [dir6, f])]) {
+  const { default: subject } = await import(pathToFileURL(path.join(base, file)).href);
+  const where = (...parts) => [base === dir6 ? `kelas6/${file}` : file, ...parts].join(' › ');
   if (!subject?.id || !Array.isArray(subject.chapters) || !subject.source) {
     problems.push(`${file}: butuh id, source, dan chapters`);
     continue;
@@ -26,6 +29,7 @@ for (const file of files) {
     if (!chapter.title || !chapter.lessons?.length) problems.push(where(chapter.id, 'bab tanpa judul/pelajaran'));
     for (const lesson of chapter.lessons ?? []) {
       lessonCount += 1;
+      if (base === dir6) lessons6 += 1;
       const at = (...p) => where(chapter.id, lesson.id, ...p);
       if (seenLessonIds.has(lesson.id)) problems.push(at(`id ganda (juga di ${seenLessonIds.get(lesson.id)})`));
       seenLessonIds.set(lesson.id, file);
@@ -93,6 +97,33 @@ for (const file of files) {
   for (const id of ids) if (!book.chapters.some((c) => c.id === id)) problems.push(`buku ${subjectId}: bab ${id} belum diringkas`);
 }
 
+/* ── Bank Soal: id bab cocok, bentuk soal valid ── */
+const { BANK_LOADERS, expand } = await import(pathToFileURL(path.resolve('src/data/questions/index.js')).href);
+let bankCount = 0;
+for (const [sid, load] of Object.entries(BANK_LOADERS)) {
+  const { default: bank } = await load();
+  const { default: subject } = await import(pathToFileURL(path.join(dir, `${sid}.js`)).href);
+  const ids = new Set(subject.chapters.map((c) => c.id));
+  for (const [cid, list] of Object.entries(bank)) {
+    if (!ids.has(cid)) problems.push(`bank ${sid} › ${cid}: bab tidak ada di materi`);
+    list.forEach((raw, i) => {
+      bankCount += 1;
+      const at = `bank ${sid} › ${cid} #${i + 1}`;
+      let q;
+      try { q = expand(raw); } catch (e) { problems.push(`${at}: ${e.message}`); return; }
+      if (!q.prompt || !q.hint) problems.push(`${at}: butuh soal & petunjuk`);
+      if (q.type === 'multiple-choice') {
+        const labels = q.options.map((o) => o.label);
+        if (labels.length < 3) problems.push(`${at}: pilihan kurang dari 3`);
+        if (new Set(labels).size !== labels.length) problems.push(`${at}: pilihan ganda kembar`);
+      }
+      if (q.type === 'number' && !/^\d+(\/\d+)?$/.test(String(q.answer))) problems.push(`${at}: jawaban angka tidak valid (${q.answer})`);
+      if (q.type === 'sequence' && new Set(q.steps).size !== q.steps.length) problems.push(`${at}: langkah ganda`);
+      if (q.type === 'drag-match' && new Set(q.pairs.map((p) => p.left)).size !== q.pairs.length) problems.push(`${at}: sisi kiri ganda`);
+    });
+  }
+}
+
 /* ── Kartu kosakata: minimal 3 kartu (kuis butuh 3 pilihan), tanpa kata ganda ── */
 const { VOCAB_SETS } = await import(pathToFileURL(path.resolve('src/data/vocab.js')).href);
 for (const set of VOCAB_SETS) {
@@ -105,4 +136,4 @@ if (problems.length) {
   console.error(`✗ ${problems.length} masalah ditemukan:\n` + problems.map((p) => `  - ${p}`).join('\n'));
   process.exit(1);
 }
-console.log(`✓ ${files.length} mapel, ${lessonCount} pelajaran, ${quizCount} soal, ${CODING_LEVELS.length} level koding, ${bookChapters} bab buku ringkas, ${VOCAB_SETS.length} set kosakata — semua valid.`);
+console.log(`✓ ${files.length} mapel Kelas 5 + ${files6.length} mapel Kelas 6 (${lessons6} pelajaran), ${lessonCount} pelajaran total, ${quizCount} soal + ${bankCount} soal bank, ${CODING_LEVELS.length} level koding, ${bookChapters} bab buku ringkas, ${VOCAB_SETS.length} set kosakata — semua valid.`);

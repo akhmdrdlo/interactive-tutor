@@ -32,6 +32,8 @@ function defaults() {
     },
     settings: { sound: true },
     daily: { date: '', practice: 0, visits: 0 }, // batas bintang harian dari latihan & tamu
+    missions: { date: '', counts: {}, claimed: [] }, // Misi Harian (lihat core/missions.js)
+    stickers: [],          // id stiker dari misi harian yang tuntas
     review: [],            // Kotak Ulang: soal yang pernah salah di percobaan pertama { subjectId, quiz }
     savedAt: null,
   };
@@ -89,6 +91,13 @@ function sanitize(raw) {
       practice: Math.max(0, Math.floor(Number(raw.daily?.practice) || 0)),
       visits: Math.max(0, Math.floor(Number(raw.daily?.visits) || 0)),
     },
+    missions: {
+      date: typeof raw.missions?.date === 'string' ? raw.missions.date : '',
+      counts: Object.fromEntries(Object.entries(raw.missions?.counts ?? {})
+        .filter(([, v]) => Number.isFinite(Number(v))).map(([k, v]) => [k, Math.max(0, Math.floor(Number(v)))])),
+      claimed: Array.isArray(raw.missions?.claimed) ? raw.missions.claimed.filter((x) => typeof x === 'string') : [],
+    },
+    stickers: Array.isArray(raw.stickers) ? [...new Set(raw.stickers.filter((x) => typeof x === 'string'))] : [],
     savedAt: typeof raw.savedAt === 'string' ? raw.savedAt : null,
   };
 }
@@ -148,6 +157,7 @@ export const store = {
       s.progress[subjectId][lessonId] = { done: true, at: new Date().toISOString(), best: best + earned };
       s.stars += earned;
     });
+    import('./missions.js').then((m) => m.markMission('lesson'));
     return earned;
   },
 

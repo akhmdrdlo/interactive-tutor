@@ -122,9 +122,9 @@ function shuffleArr(list) {
 }
 
 /* ── Latihan Berhitung ── */
-export function openMathDrill({ onBack } = {}) {
+export function openMathDrill({ onBack, topic = null, title = 'Latihan Berhitung' } = {}) {
   openSheet({
-    title: 'Latihan Berhitung',
+    title,
     tone: 'peach',
     silent: true,
     render(body) {
@@ -169,7 +169,7 @@ export function openMathDrill({ onBack } = {}) {
         const t = e.target.closest('[data-topic]');
         if (t) { sfx.pop(); session(t.dataset.topic); }
       });
-      topics();
+      if (topic) session(topic); else topics();
     },
   });
 }

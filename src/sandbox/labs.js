@@ -13,6 +13,7 @@ import { C } from '../core/palette.js';
 import { openSheet } from '../ui/sheet.js';
 import { icon } from '../ui/icons.js';
 import { toast, starBurst } from '../ui/feedback.js';
+import { markMission } from '../core/missions.js';
 
 const LAB_KEY = 'lab';
 const LAB_REWARD = 2;
@@ -52,7 +53,7 @@ function labBunyi(host, lab) {
     const bar = e.target.closest('.xylo__bar');
     if (!bar) return;
     const i = Number(bar.dataset.i);
-    if (store.get().settings.sound) {
+    if (store.get().settings.sound) try {
       ctx ??= new (window.AudioContext || window.webkitAudioContext)();
       const t = ctx.currentTime;
       const osc = ctx.createOscillator();
@@ -65,7 +66,7 @@ function labBunyi(host, lab) {
       osc.connect(g).connect(ctx.destination);
       osc.start(t);
       osc.stop(t + 1);
-    }
+    } catch { /* suara tidak tersedia di browser ini */ }
     bar.classList.remove('is-hit'); void bar.offsetWidth; bar.classList.add('is-hit');
     played.add(i);
     host.querySelector('[data-say]').textContent = i === 0 ? 'Itu batang terpanjang — nadanya paling rendah!' : i === 7 ? 'Batang terpendek — nadanya paling tinggi!' : `Sudah ${played.size} dari 8 batang.`;
@@ -220,6 +221,7 @@ function labPecahan(host, lab) {
 const RUN = { bunyi: labBunyi, bayangan: labBayangan, warna: labWarna, pecahan: labPecahan };
 
 export function openLabs({ onBack } = {}) {
+  markMission('lab');
   openSheet({
     title: 'Lab Mini',
     tone: 'mint',

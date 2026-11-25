@@ -282,3 +282,7 @@
   .story--student { flex-direction: column; align-items: flex-end; }
   .story__bubble::after { display: none; }
 }
+.chapter__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.quiz-feedback { flex-wrap: wrap; }
+.quiz-feedback__why { flex-basis: 100%; margin: 0; padding-left: 70px; font-size: 0.95rem; }
+@media (max-width: 560px) { .quiz-feedback__why { padding-left: 0; } }

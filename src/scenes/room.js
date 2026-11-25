@@ -16,6 +16,7 @@ import { speechBubble } from '../ui/feedback.js';
 import { decorArt } from './decor-art.js';
 import { findDecor } from '../data/decor.js';
 import * as art from './room-art.js';
+import { outdoorDefs, outdoorBackground, frontDoor, BUILDINGS, buildingArt, villageLife } from './outdoor-art.js';
 
 const { WORLD } = art;
 
@@ -35,7 +36,7 @@ const MOCHI_TIPS = [
 ];
 
 /** Titik berdiri di depan tiap benda (koordinat x dunia). */
-const ANCHORS = { subjects: 560, wardrobe: 1180, coding: 1560, decor: 760, bed: 2290, study: 3350 };
+const ANCHORS = { subjects: 560, wardrobe: 1180, coding: 1560, decor: 760, bed: 2290, study: 3350, ...Object.fromEntries(BUILDINGS.map((b) => [b.id, b.anchor])) };
 const SPEED = 640;          // satuan dunia per detik
 const AVATAR = { baseX: 900, width: 270, height: 360, top: 528 };
 const MIN_X = 160;
@@ -69,11 +70,16 @@ export function mountRoom(stage, actions) {
     <svg class="room" viewBox="0 0 ${W} ${WORLD.h}" style="aspect-ratio:${W} / ${WORLD.h}" preserveAspectRatio="xMinYMid meet"
          xmlns="http://www.w3.org/2000/svg" role="group" aria-label="Kamar belajarmu">
       ${art.defs()}
+      <defs>${outdoorDefs()}</defs>
       ${art.background()}
+      ${outdoorBackground()}
       <rect class="walk-surface" x="0" y="${WORLD.floorY}" width="${W}" height="${WORLD.h - WORLD.floorY}" fill="transparent"/>
       ${art.windowArt()}
       ${art.frameArt()}
       ${art.roundWindow()}
+      ${frontDoor()}
+      ${BUILDINGS.map((b) => hotspot({ action: b.id, label: `${b.label}: masuk`, body: buildingArt(b) })).join('')}
+      ${villageLife()}
       ${art.bunting()}
       <g id="decor-wall"></g>
       ${art.contactShadows()}
@@ -82,7 +88,7 @@ export function mountRoom(stage, actions) {
       ${hotspot({ action: 'subjects', label: 'Rak buku: buka daftar pelajaran', tagText: 'Rak Buku', tagAt: [530, 128], body: art.bookshelf() })}
       ${hotspot({ action: 'wardrobe', label: 'Lemari baju: ganti gaya', tagText: 'Lemari Baju', tagAt: [1250, 170], body: art.wardrobe() })}
       ${hotspot({ action: 'coding', label: 'Komputer: main minigame koding', tagText: 'Komputer', tagAt: [1610, 336], body: art.desk() })}
-      ${hotspot({ action: 'bed', label: 'Tempat tidur', tagText: 'Tempat Tidur', tagAt: [2230, 430], body: art.bed() })}
+      ${hotspot({ action: 'bed', label: 'Tempat tidur', tagText: 'Tempat Tidur', tagAt: [2300, 510], body: art.bed() })}
       ${art.nightstand()}
       ${art.studyBoard()}
       ${hotspot({ action: 'study', label: 'Meja belajar: baca buku dan latihan', tagText: 'Meja Belajar', tagAt: [3350, 160], body: art.studyDesk() })}

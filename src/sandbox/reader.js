@@ -11,7 +11,9 @@ import { toast, starBurst } from '../ui/feedback.js';
 import { SUBJECTS } from '../data/subjects.js';
 import { runSession } from './session.js';
 import { shuffle } from '../quiz/shuffle.js';
+import { loadBank } from '../data/questions/index.js';
 import { speak, canSpeak, stopSpeaking } from '../core/speech.js';
+import { markMission } from '../core/missions.js';
 
 const READ_KEY = 'baca';
 const READ_REWARD = 2;
@@ -23,6 +25,7 @@ async function loadBook(subject) {
 
 /** Daftar mapel yang punya buku ringkas. */
 export function openBookshelf({ onBack } = {}) {
+  markMission('read');
   openSheet({
     title: 'Buku Ringkas',
     tone: 'sky',
@@ -156,7 +159,8 @@ export async function openReader(subject, chapterId, { onBack } = {}) {
 
       async function practice() {
         const lessons = (await subject.load()).default.chapters.find((c) => c.id === chapter.id)?.lessons ?? [];
-        const questions = shuffle(lessons.flatMap((l) => l.quiz)).slice(0, 5).map((quiz) => ({ quiz }));
+        const bank = (await loadBank(subject.id))[chapter.id] ?? [];
+        const questions = shuffle([...lessons.flatMap((l) => l.quiz), ...bank]).slice(0, 6).map((quiz) => ({ quiz, subjectId: subject.id }));
         if (!questions.length) { toast('Soal untuk bab ini belum ada.'); return; }
         runSession(body, {
           questions,

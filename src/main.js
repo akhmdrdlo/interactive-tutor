@@ -35,7 +35,10 @@ import { openSubjects, openSave } from './scenes/panels.js';
 import { openDecor, initDecor } from './scenes/decor.js';
 import { openComputer } from './minigames/hub.js';
 import { openStudyDesk } from './sandbox/desk.js';
+import { openLibrary, openMarket, openPark, openMuseum, openSchool6 } from './scenes/village.js';
 import { initVisitors } from './scenes/visitors.js';
+import { openMissions } from './scenes/missions.js';
+import { unclaimedCount } from './core/missions.js';
 
 injectCssVars();
 
@@ -45,6 +48,11 @@ const actions = {
   decor: openDecor,
   coding: openComputer,
   study: openStudyDesk,
+  library: openLibrary,
+  market: openMarket,
+  park: openPark,
+  museum: openMuseum,
+  school: openSchool6,
 };
 
 const chevron = (dir) => `<svg viewBox="0 0 48 48" aria-hidden="true"><path d="${dir < 0 ? 'M29 12 L17 24 L29 36' : 'M19 12 L31 24 L19 36'}" fill="none" stroke="#4A352D" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
@@ -57,8 +65,9 @@ app.innerHTML = `
       <p class="star-pill" data-stars-pill>${icon('star')}<span data-stars></span><span class="sr-only"> bintang</span></p>
     </div>
     <div class="hud__group">
+      <button type="button" class="btn btn--small hud__missions" data-missions aria-label="Misi hari ini">${icon('check')}<span>Misi</span><b class="hud__dot" data-missions-dot hidden></b></button>
       <button type="button" class="icon-btn" data-sound></button>
-      <button type="button" class="btn btn--small" data-save>${icon('save')}<span>Simpan</span></button>
+      <button type="button" class="btn btn--small hud__save" data-save aria-label="Simpan">${icon('save')}<span>Simpan</span></button>
     </div>
   </header>
   <main class="stage-wrap">
@@ -107,7 +116,15 @@ soundBtn.addEventListener('click', () => {
   sfx.pop();
 });
 $('[data-save]', app).addEventListener('click', () => { sfx.pop(); openSave(); });
+$('[data-missions]', app).addEventListener('click', () => { sfx.pop(); openMissions(); });
+const missionDot = $('[data-missions-dot]', app);
+const paintMissions = () => { const n = unclaimedCount(); missionDot.hidden = !n; missionDot.textContent = n; };
+paintMissions();
+store.subscribe(paintMissions);
 
 for (const btn of app.querySelectorAll('[data-go]')) {
   onActivate(btn, () => { sfx.pop(); actions[btn.dataset.go](); });
 }
+
+// Pengait uji untuk skrip HP (hanya dev, dibuang saat build)
+if (import.meta.env.DEV) import('./dev-hooks.js').then((m) => m.installDevHooks());

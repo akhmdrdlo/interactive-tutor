@@ -10,6 +10,7 @@ import { mochiSvg } from '../scenes/room-art.js';
 import { mountChoice } from './choice.js';
 import { mountSlots } from './slots.js';
 import { mountNumber } from './numpad.js';
+import { markMission } from '../core/missions.js';
 
 const PRAISE = ['Hebat!', 'Pintar sekali!', 'Tepat sekali!', 'Keren!', 'Mantap!'];
 const NUDGE = ['Hampir tepat!', 'Sedikit lagi!', 'Belum pas, tapi kamu hampir sampai!'];
@@ -55,12 +56,13 @@ export function renderQuiz(stage, quiz, { onCorrect, onNext, nextLabel = 'Lanjut
     feedback.dataset.tone = correct ? 'good' : 'try';
     if (correct) {
       sfx.success();
-      feedback.innerHTML = `<span class="quiz-feedback__mochi">${mochiSmall(true)}</span><p><b>${pick(PRAISE)}</b> ${quiz.explain ? esc(quiz.explain) : 'Jawabanmu benar.'}</p>`;
+      feedback.innerHTML = `<span class="quiz-feedback__mochi">${mochiSmall(true)}</span><p><b>${pick(PRAISE)}</b> ${quiz.explain ? esc(quiz.explain) : 'Jawabanmu benar.'}</p>${!quiz.explain && quiz.hint ? `<p class="quiz-feedback__why"><b>Kenapa?</b> ${esc(quiz.hint)}</p>` : ''}`;
       checkBtn.hidden = true;
       nextBtn.hidden = false;
       nextBtn.focus();
       const rect = feedback.getBoundingClientRect();
       starBurst(rect.left + 40, rect.top + rect.height / 2, 8);
+      markMission('correct');
       onCorrect?.(attempts === 1);
     } else {
       sfx.nudge();
